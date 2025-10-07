@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flashcards SRS (v7 - Fix Hauteur)</title>
+    <title>Flashcards SRS (v8)</title>
     
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
@@ -73,6 +73,7 @@
         
         .btn:hover { opacity: 0.9; }
         .btn-secondary { background-color: var(--grey-light); color: var(--text-color); }
+        .btn-quit { background-color: transparent; color: var(--danger); border: 1px solid var(--danger); }
 
         #deck-info { margin-bottom: 16px; color: var(--grey-dark); }
         #card-container {
@@ -121,7 +122,10 @@
         #btn-good { background-color: var(--success); }
         #btn-easy { background-color: var(--primary-color); }
         
-        .controls { margin-top: 24px; border-top: 1px solid var(--grey-light); padding-top: 16px; }
+        .controls { 
+            margin-top: 24px; border-top: 1px solid var(--grey-light); padding-top: 16px;
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+        }
         #file-input { display: none; }
         #permanent-decks-container { display: flex; flex-wrap: wrap; justify-content: center; }
 
@@ -159,8 +163,8 @@
                 </div>
 
                 <div class="controls">
-                    <button class="btn btn-secondary" onclick="document.getElementById('file-input').click();">Charger un autre deck</button>
-                    <button class="btn btn-secondary" id="download-progress">Télécharger la progression</button>
+                    <button class="btn btn-secondary" id="download-progress">Télécharger Progression</button>
+                    <button class="btn btn-quit" id="btn-quit-session">Quitter & retourner au menu</button>
                 </div>
             </div>
         </main>
@@ -183,6 +187,7 @@
         const noCardsMessage = document.getElementById('no-cards-message');
         const themeToggle = document.getElementById('theme-toggle');
         const backToLibraryBtn = document.getElementById('btn-back-to-library');
+        const quitSessionBtn = document.getElementById('btn-quit-session'); // Nouveau bouton
 
         // --- STATE MANAGEMENT ---
         let appState = { deckName: null, cards: [], dueCards: [], currentCardIndex: -1 };
@@ -270,18 +275,14 @@
             cardFront.innerHTML = marked.parse(card.Question || '');
             cardBack.innerHTML = marked.parse(card.Réponse || '');
             answerButtons.classList.add('hidden');
-            // AJOUT: Appeler la fonction d'ajustement de la hauteur
             adjustCardHeight();
         }
 
         function adjustCardHeight() {
-            // On laisse la hauteur s'ajuster automatiquement pour la mesure
             cardContainer.style.height = 'auto';
             const frontHeight = cardFront.scrollHeight;
             const backHeight = cardBack.scrollHeight;
-            // On prend la plus grande des deux hauteurs (recto ou verso)
             const maxHeight = Math.max(frontHeight, backHeight);
-            // On applique cette hauteur au conteneur, sans aller en dessous de 200px
             cardContainer.style.height = `${Math.max(maxHeight, 200)}px`;
         }
 
@@ -293,7 +294,7 @@
                 const response = await fetch('decks/manifest.json');
                 const manifest = await response.json();
                 const container = document.getElementById('permanent-decks-container');
-                container.innerHTML = ''; // Clear previous buttons
+                container.innerHTML = '';
                 manifest.forEach(deckInfo => {
                     const button = document.createElement('button');
                     button.className = 'btn';
@@ -324,10 +325,7 @@
                     if (qIndex === -1 || rIndex === -1) throw new Error("Colonnes 'Question' et 'Réponse' manquantes.");
                     const cardsData = lines.map(line => {
                         const values = line.split(',');
-                        return {
-                            Question: (values[qIndex] || "").trim().replace(/"/g, ''),
-                            Réponse: (values[rIndex] || "").trim().replace(/"/g, '')
-                        };
+                        return { Question: (values[qIndex] || "").trim().replace(/"/g, ''), Réponse: (values[rIndex] || "").trim().replace(/"/g, '') };
                     });
                     initializeDeck(cardsData, deckName);
                 } catch (err) { alert(`Erreur de lecture du CSV: ${err.message}`); }
@@ -338,7 +336,7 @@
         function downloadProgress() {
             if (!appState.cards || appState.cards.length === 0) return;
             const headers = "Question,Réponse,prochaine_revision,intervalle,facteur_facilite,statut";
-            const rows = appState.cards.map(c => `"${c.Question}","${c.Réponse}",${c.prochaine_revision},${c.intervalle},${c.facteur_facilite},${c.statut}`);
+            const rows = appState.cards.map(c => `"${c.Question.replace(/"/g, '""')}","${c.Réponse.replace(/"/g, '""')}",${c.prochaine_revision},${c.intervalle},${c.facteur_facilite},${c.statut}`);
             const csvContent = [headers, ...rows].join('\n');
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
@@ -374,6 +372,12 @@
         downloadBtn.addEventListener('click', downloadProgress);
         themeToggle.addEventListener('click', toggleTheme);
         backToLibraryBtn.addEventListener('click', resetApp);
+        
+        quitSessionBtn.addEventListener('click', () => {
+            if (confirm("Êtes-vous sûr de vouloir quitter ? La progression sur les cartes déjà vues est sauvegardée.")) {
+                resetApp();
+            }
+        });
 
         answerButtons.addEventListener('click', (e) => {
             if(e.target.tagName !== 'BUTTON') return;
