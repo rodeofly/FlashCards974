@@ -1,0 +1,42 @@
+[
+  {
+    "Question": "Selon **Yves Clot**, quelle est la distinction fondamentale à faire *avant* toute action de formation ?",
+    "Réponse": "Il faut distinguer :\n\n- Le **travail prescrit** : Ce qui *devrait* être fait (procédures, fiches de poste).\n- Le **travail réel** : Ce qui est *effectivement* fait, avec ses dilemmes, ses ajustements et son intelligence pratique.\n\n*La formation doit s'adresser au **travail réel** pour être pertinente.*"
+  },
+  {
+    "Question": "Quelle dimension du travail **Christophe Dejours** nous invite-t-il à analyser à travers la `psychodynamique du travail` ?",
+    "Réponse": "La dimension **subjective** du travail, qui oscille entre :\n\n- La **souffrance** : quand le travail est empêché ou source de tensions.\n- Le **plaisir** : quand le travail permet la sublimation et la reconnaissance.\n\n*Comprendre cela permet d'identifier les freins et les moteurs psychologiques à l'apprentissage.*"
+  },
+  {
+    "Question": "Quels sont les 4 principes clés de l'**andragogie** selon **Malcolm Knowles** ?",
+    "Réponse": "L'apprenant adulte a besoin :\n\n1.  **D'autonomie** : Être impliqué dans le diagnostic et la planification de sa formation.\n2.  **D'expérience** : Utiliser son vécu comme une ressource riche pour apprendre.\n3.  **De pragmatisme** : Orienter son apprentissage vers la résolution de problèmes concrets.\n4.  **De motivation intrinsèque** : Apprendre ce qui a du sens et de l'utilité pour lui."
+  },
+  {
+    "Question": "À quoi sert le concept de **\"non-public\"** de **Bertrand Schwartz** dans l'analyse des besoins ?",
+    "Réponse": "Il sert à **inverser la logique** de l'ingénierie de formation.\n\nAu lieu de concevoir une offre et d'attendre que le public vienne, il s'agit de :\n\n1.  Partir des **besoins et des caractéristiques** des personnes les plus éloignées de la formation.\n2.  Construire un **dispositif sur-mesure** pour les rendre capables d'y participer.\n\n*C'est une démarche d'ingénierie inclusive.*"
+  },
+  {
+    "Question": "Quel est l'objectif de l'**ergonomie de la conception**, approche défendue par des auteurs comme **Florent Hubault** ?",
+    "Réponse": "L'objectif n'est pas d'adapter l'Homme au travail, mais de **concevoir des systèmes** (outils, organisations, et formations) qui sont **adaptés à l'Homme en activité**.\n\nPour un formateur, cela signifie créer un dispositif qui tient compte des contraintes réelles du travail pour mieux soutenir la performance."
+  },
+  {
+    "Question": "Comment la théorie du **\"cours d'action\"** de **Marc Durand** permet-elle d'analyser l'activité ?",
+    "Réponse": "Elle analyse l'activité comme un **\"film\" vécu par l'acteur**, un flux dynamique et inséparable de six composantes :\n\n- `Action`\n- `Perception`\n- `Communication`\n- `Cognition`\n- `Émotion`\n\n*Analyser ce film permet de comprendre la logique de l'acteur de l'intérieur, ce qui est crucial pour concevoir une formation pertinente.*"
+  },
+  {
+    "Question": "Quelle perspective **Claude Lessard** apporte-t-il à l'analyse du contexte d'une formation ?",
+    "Réponse": "Une perspective **sociologique** sur la **professionnalisation**.\n\nIl invite à voir la formation non seulement comme un acte technique, mais aussi comme un enjeu social et politique qui participe à :\n\n- La **transformation d'un métier**.\n- La construction de son **identité** et de sa **reconnaissance**."
+  },
+  {
+    "Question": "Dans le pôle MACRO, quel est l'apport principal d'un ergonome comme **Alain Moussard** ?",
+    "Réponse": "Son apport est d'intégrer la dimension de la **santé et de l'intégrité physique** dans l'analyse du travail.\n\n*Avant de former à un geste technique, il faut analyser si ce geste n'est pas pathogène ou s'il existe des manières de le réaliser qui préservent la santé du professionnel sur le long terme.*"
+  },
+  {
+    "Question": "Quelle est la principale différence entre l'approche de **Clot** (clinique de l'activité) et celle de **Dejours** (psychodynamique) ?",
+    "Réponse": "Bien que complémentaires, leur focus diffère :\n\n- **Dejours** se concentre sur la **dynamique psychique** de l'individu face au travail (souffrance/plaisir).\n- **Clot** se concentre sur le **développement du métier et du pouvoir d'agir** à travers le dialogue sur l'activité réelle.\n\n*L'un est centré sur le `sujet`, l'autre sur l'`activité` elle-même.*"
+  },
+  {
+    "Question": "En une phrase, quel est l'objectif final du **Pôle MACRO** pour un formateur ?",
+    "Réponse": "**S'assurer que la formation qui sera conçue répondra à un problème *réel* du travail et non à une simple demande formelle.**"
+  }
+]
