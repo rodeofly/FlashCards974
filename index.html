@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flashcards SRS (v4)</title>
+    <title>Flashcards SRS (v5 - Markdown)</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
     <style>
         :root {
             --bg-color: #f4f4f9;
@@ -80,10 +83,17 @@
         #card-container.is-flipped .card-inner { transform: rotateX(180deg); }
         .card-face {
             position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
-            display: flex; justify-content: center; align-items: center; padding: 20px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;
             border: 1px solid var(--grey-light); border-radius: var(--border-radius);
-            font-size: 20px; white-space: pre-wrap;
+            font-size: 20px; white-space: pre-wrap; text-align: center;
         }
+        .card-face > *:first-child { margin-top: 0; }
+        .card-face > *:last-child { margin-bottom: 0; }
+        .card-face h1, .card-face h2, .card-face h3 { margin: 10px 0; font-size: 1.2em; }
+        .card-face p { margin: 10px 0; }
+        .card-face ul, .card-face ol { text-align: left; margin-left: 20px; }
+        .card-face code { background-color: var(--grey-light); padding: 2px 5px; border-radius: 4px; font-family: monospace; }
+        
         .card-front { background-color: var(--card-bg); }
         .card-back { background-color: var(--card-bg); transform: rotateX(180deg); }
 
@@ -237,8 +247,9 @@
         function showCard() {
             const card = appState.dueCards[appState.currentCardIndex];
             cardContainer.classList.remove('hidden', 'is-flipped');
-            cardFront.textContent = card.Question;
-            cardBack.textContent = card.Réponse;
+            // MODIFICATION: Utilisation de marked.parse() pour le Markdown
+            cardFront.innerHTML = marked.parse(card.Question);
+            cardBack.innerHTML = marked.parse(card.Réponse);
             answerButtons.classList.add('hidden');
         }
         function flipCard() { if (appState.dueCards.length > 0) { cardContainer.classList.add('is-flipped'); answerButtons.classList.remove('hidden'); } }
