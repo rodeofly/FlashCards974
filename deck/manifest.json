@@ -1,0 +1,10 @@
+[
+  {
+    "nom": "Vocabulaire Anglais",
+    "fichier": "anglais.json"
+  },
+  {
+    "nom": "Capitales du Monde",
+    "fichier": "capitales.json"
+  }
+]
