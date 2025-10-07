@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flashcards SRS (v9)</title>
+    <title>Flashcards SRS (v10)</title>
     
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
@@ -98,7 +98,7 @@
             backface-visibility: hidden;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start; /* CORRECTION ICI: Aligne le contenu en haut */
             align-items: center;
             padding: 20px;
             border: 1px solid var(--grey-light);
@@ -336,8 +336,8 @@
                 cardFront.innerHTML = marked.parse(questionText || '');
                 cardBack.innerHTML = marked.parse(answerText || '');
             } else {
-                cardFront.innerHTML = marked.parse(answerText || ''); // Affiche Réponse au recto
-                cardBack.innerHTML = marked.parse(questionText || ''); // Affiche Question au verso
+                cardFront.innerHTML = marked.parse(answerText || '');
+                cardBack.innerHTML = marked.parse(questionText || '');
             }
 
             answerButtons.classList.add('hidden');
@@ -355,7 +355,7 @@
         function flipCard() { if (appState.dueCards.length > 0) { cardContainer.classList.add('is-flipped'); answerButtons.classList.remove('hidden'); } }
 
         // --- FILE HANDLING & STUDY MODES ---
-        let deckToLoad = null; // Variable temporaire pour stocker les infos du deck à charger
+        let deckToLoad = null;
 
         async function loadPermanentDecks() {
             try {
@@ -390,7 +390,7 @@
                 } else if (deckToLoad.type === 'local') {
                     initializeDeck(deckToLoad.data, deckToLoad.name, selectedMode);
                 }
-                deckToLoad = null; // Reset
+                deckToLoad = null;
             }
         });
 
@@ -459,7 +459,6 @@
             applySavedTheme();
             await loadPermanentDecks();
             if (loadState()) {
-                // If a state is loaded, we need to ensure studyMode has a default value if it's from an old version
                 if (typeof appState.studyMode === 'undefined') {
                     appState.studyMode = 'recto';
                 }
