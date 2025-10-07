@@ -1,0 +1,12 @@
+[
+  {"Question": "Apple", "Réponse": "Pomme"},
+  {"Question": "Car", "Réponse": "Voiture"},
+  {"Question": "House", "Réponse": "Maison"},
+  {"Question": "Book", "Réponse": "Livre"},
+  {"Question": "Water", "Réponse": "Eau"},
+  {"Question": "Computer", "Réponse": "Ordinateur"},
+  {"Question": "Tree", "Réponse": "Arbre"},
+  {"Question": "Sun", "Réponse": "Soleil"},
+  {"Question": "Moon", "Réponse": "Lune"},
+  {"Question": "Friend", "Réponse": "Ami(e)"}
+]
