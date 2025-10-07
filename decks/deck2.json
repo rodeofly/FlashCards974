@@ -1,0 +1,42 @@
+[
+  {
+    "Question": "Quel est l'objectif principal de la **Didactique Professionnelle**, portée par des auteurs comme **Goigoux, Thevenet, Bertone & Serre** ?",
+    "Réponse": "Analyser l'activité de travail (Pôle MACRO) pour **identifier les savoirs essentiels et implicites** et les transformer en **contenus de formation**.\n\nSon but est de concevoir des situations d'apprentissage basées sur des *situations professionnelles de référence*."
+  },
+  {
+    "Question": "Quelle est la spécificité de la **Didactique Clinique** de **Serge Chaliès** ?",
+    "Réponse": "Elle se focalise sur la manière dont les **\"règles du métier\"** sont apprises, transmises et adaptées en situation.\n\nLe formateur doit donc concevoir des scénarios qui permettent aux apprenants de s'approprier et de questionner ces règles pour agir efficacement."
+  },
+  {
+    "Question": "En quoi consiste une **\"situation-problème\"** selon **Philippe Meirieu** ?",
+    "Réponse": "C'est une situation pédagogique conçue pour qu'un apprenant :\n\n1.  Se heurte à un **obstacle** qu'il ne peut surmonter avec ses connaissances actuelles.\n2.  Mobilise ses ressources et en construise de nouvelles pour **franchir l'obstacle**.\n3.  Formalise ce nouvel apprentissage (**métacognition**).\n\n*L'objectif est de rendre le savoir nécessaire pour résoudre un problème.*"
+  },
+  {
+    "Question": "Quels sont les 3 sommets du **Triangle Pédagogique** de **Jean Houssaye** et quel est son intérêt pour la conception (Pôle MÉSO) ?",
+    "Réponse": "Les 3 sommets sont : **Apprenant - Savoir - Formateur**.\n\nSon intérêt est de forcer le concepteur à choisir consciemment quel processus privilégier dans son scénario :\n\n- L'axe `Formateur-Savoir` → Processus **Enseigner**\n- L'axe `Formateur-Apprenant` → Processus **Former**\n- L'axe `Apprenant-Savoir` → Processus **Apprendre**"
+  },
+  {
+    "Question": "Quelle est la différence majeure entre le **constructivisme** de **Piaget** et le **socioconstructivisme** de **Vygotski** ?",
+    "Réponse": "- **Piaget** (Constructivisme) : L'apprentissage est une **construction individuelle** de l'esprit face à un obstacle.\n- **Vygotski** (Socioconstructivisme) : L'apprentissage est d'abord un **phénomène social** (interaction, langage) qui est ensuite intériorisé par l'individu.\n\n*Pour le formateur, cela signifie qu'il faut concevoir à la fois des défis cognitifs et des moments d'interaction.*"
+  },
+  {
+    "Question": "Comment les concepts de **ZPD** (Vygotski) et d'**Étayage** (Bruner) s'articulent-ils dans la conception d'une séquence ?",
+    "Réponse": "Ils sont inséparables :\n\n1.  La **Zone Proximale de Développement (ZPD)** est l'espace entre ce que l'apprenant peut faire seul et ce qu'il peut faire avec de l'aide.\n2.  L'**Étayage** est l'ensemble des aides (outils, questions, encouragements) que le formateur conçoit pour permettre à l'apprenant de progresser dans cette zone.\n\n*Le formateur doit donc concevoir à la fois la tâche (dans la ZPD) et les aides (l'étayage).* "
+  },
+  {
+    "Question": "Au niveau MÉSO, comment la théorie du **\"cours d'action\"** (**Marc Durand**) influence-t-elle la conception des formations ?",
+    "Réponse": "Elle incite à concevoir des **simulations dynamiques** ou des études de cas qui ne se focalisent pas juste sur la technique, mais qui permettent de travailler l'ensemble du \"film\" de l'activité :\n\n- La *perception* des indices pertinents.\n- La *gestion des émotions*.\n- La *prise de décision* en temps réel."
+  },
+  {
+    "Question": "Quel est le rôle de l'**évaluation**, selon des auteurs comme **De Ketele**, dans la phase de conception (Pôle MÉSO) ?",
+    "Réponse": "L'évaluation n'est pas une étape finale, elle doit être **pensée dès le début** et intégrée au scénario.\n\n- `Évaluation Diagnostique` : Pour connaître le \"déjà-là\" des apprenants.\n- `Évaluation Formative` : Pour réguler l'apprentissage *pendant* la formation.\n- `Évaluation Sommative` : Pour valider les acquis par rapport aux **objectifs SMART** fixés."
+  },
+  {
+    "Question": "Qu'appelle-t-on la **transposition didactique** dans le Pôle MÉSO ?",
+    "Réponse": "C'est le processus de **transformation** d'un savoir ou d'une pratique complexe en un objet d'apprentissage enseignable.\n\nCela implique de :\n\n1.  **Sélectionner** les éléments pertinents du savoir expert.\n2.  Les **Simplifier** et les **Structurer** pour les rendre accessibles.\n3.  Les **Mettre en scène** dans un scénario pédagogique.\n\n*C'est un acte de \"traduction\" au cœur du travail de conception.*"
+  },
+  {
+    "Question": "En une phrase, quel est l'objectif final du **Pôle MÉSO** pour un formateur ?",
+    "Réponse": "**Traduire l'analyse stratégique du travail (Pôle MACRO) en un scénario d'apprentissage structuré, engageant et efficace.**"
+  }
+]
