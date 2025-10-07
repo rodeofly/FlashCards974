@@ -3,169 +3,334 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bibliothèque de CSV</title>
+    <title>Flashcards SRS (GitHub)</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; height: 100vh; margin: 0; background-color: #f9f9f9; }
-        #sidebar { width: 350px; border-right: 1px solid #e1e4e8; padding: 1em; overflow-y: auto; background-color: #fff; }
-        #content { flex-grow: 1; padding: 1em; overflow: auto; }
-        h1, h2, h3 { color: #24292e; }
-        ul { list-style: none; padding-left: 20px; }
-        li.directory > span { font-weight: bold; cursor: default; color: #586069; }
-        li.file > a { text-decoration: none; color: #0366d6; cursor: pointer; display: block; padding: 4px 0; border-radius: 5px; }
-        li.file > a:hover { background-color: #f1f8ff; }
-        table { border-collapse: collapse; width: 100%; margin-top: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        th, td { border: 1px solid #dfe2e5; padding: 10px; text-align: left; }
-        th { background-color: #f6f8fa; font-weight: 600; }
-        #file-name { color: #333; font-family: monospace, monospace; background-color: #eef; padding: 5px; border-radius: 5px;}
-        .placeholder { color: #586069; text-align: center; margin-top: 50px; }
-        .error { background-color: #fce8e6; border: 1px solid #f9bdbb; padding: 15px; border-radius: 5px; }
+        :root {
+            --bg-color: #f4f4f9;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --primary-color: #4a90e2;
+            --primary-text: #ffffff;
+            --grey-light: #e0e0e0;
+            --grey-dark: #888;
+            --shadow: 0 4px 8px rgba(0,0,0,0.1);
+            --border-radius: 8px;
+            --success: #63b179;
+            --warning: #f7b544;
+            --danger: #e57373;
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --grey-light: #2c2c2c;
+            --grey-dark: #aaa;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 16px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container { width: 100%; max-width: 500px; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        h1 { font-size: 24px; }
+        
+        #theme-toggle {
+            background: none; border: 1px solid var(--grey-dark); color: var(--text-color);
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .hidden { display: none !important; }
+        
+        #welcome-screen, #app-screen {
+            background-color: var(--card-bg); padding: 24px;
+            border-radius: var(--border-radius); box-shadow: var(--shadow); text-align: center;
+        }
+
+        #welcome-screen p { margin-bottom: 16px; }
+
+        .btn {
+            background-color: var(--primary-color); color: var(--primary-text);
+            border: none; padding: 10px 16px; border-radius: var(--border-radius);
+            cursor: pointer; font-size: 16px; font-weight: 500; margin: 4px;
+            transition: opacity 0.2s;
+        }
+        
+        .btn:hover { opacity: 0.9; }
+        .btn-secondary { background-color: var(--grey-light); color: var(--text-color); }
+
+        #deck-info { margin-bottom: 16px; color: var(--grey-dark); }
+        #card-container { perspective: 1000px; min-height: 200px; margin-bottom: 16px; cursor: pointer; }
+        .card-inner {
+            position: relative; width: 100%; height: 100%; min-height: 200px;
+            transition: transform 0.6s; transform-style: preserve-3d;
+        }
+        #card-container.is-flipped .card-inner { transform: rotateX(180deg); }
+        .card-face {
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+            display: flex; justify-content: center; align-items: center; padding: 20px;
+            border: 1px solid var(--grey-light); border-radius: var(--border-radius);
+            font-size: 20px; white-space: pre-wrap;
+        }
+        .card-front { background-color: var(--card-bg); }
+        .card-back { background-color: var(--card-bg); transform: rotateX(180deg); }
+
+        #answer-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        #btn-again { background-color: var(--danger); }
+        #btn-hard { background-color: var(--warning); }
+        #btn-good { background-color: var(--success); }
+        #btn-easy { background-color: var(--primary-color); }
+        
+        .controls { margin-top: 24px; border-top: 1px solid var(--grey-light); padding-top: 16px; }
+        #file-input { display: none; }
+        #permanent-decks-container { display: flex; flex-wrap: wrap; justify-content: center; }
+
     </style>
 </head>
 <body>
 
-    <div id="sidebar">
-        <h2>📚 Bibliothèque</h2>
-        <div id="file-tree"></div>
-    </div>
-
-    <div id="content">
-        <h1>Contenu du Fichier</h1>
-        <h3 id="file-name"></h3>
-        <div id="table-container">
-            <div class="placeholder">
-                <p>Veuillez sélectionner un fichier CSV dans la bibliothèque sur la gauche.</p>
+    <div class="container">
+        <header><h1>Flashcards SRS</h1><button id="theme-toggle" title="Changer le thème">🌙</button></header>
+        <main>
+            <div id="welcome-screen">
+                <h2>Bienvenue !</h2>
+                <p>Commencez avec un deck de la bibliothèque ou importez le vôtre.</p>
+                <div id="permanent-decks-container"></div>
+                <hr style="margin: 16px 0; border-color: var(--grey-light);">
+                <button class="btn btn-secondary" onclick="document.getElementById('file-input').click();">Importer un CSV local...</button>
+                <input type="file" id="file-input" accept=".csv">
             </div>
-        </div>
+            <div id="app-screen" class="hidden">
+                <div id="deck-info"><span id="deck-name"></span> | <span id="deck-progress"></span></div>
+                <div id="card-container">
+                    <div class="card-inner">
+                        <div class="card-face card-front" id="card-front"></div>
+                        <div class="card-face card-back" id="card-back"></div>
+                    </div>
+                </div>
+                <div id="answer-buttons" class="hidden">
+                    <button class="btn" id="btn-again">À revoir (1)</button><button class="btn" id="btn-hard">Difficile (2)</button>
+                    <button class="btn" id="btn-good">Correct (3)</button><button class="btn" id="btn-easy">Facile (4)</button>
+                </div>
+                <p id="no-cards-message" class="hidden">Bravo ! Aucune carte à réviser pour aujourd'hui.</p>
+                <div class="controls">
+                    <button class="btn btn-secondary" onclick="document.getElementById('file-input').click();">Charger un autre deck</button>
+                    <button class="btn btn-secondary" id="download-progress">Télécharger la progression</button>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script>
-    // ##################################################################
-    // #                  CONFIGURATION MANUELLE                      #
-    // ##################################################################
-    //
-    // Décrivez ici l'arborescence de votre dossier "csv".
-    // Si vous ajoutez un fichier, mettez à jour cette liste !
-    //
-    const fileStructure = [
-        { 
-            name: "flashcards_formateur.csv", 
-            type: "file", 
-            path: "csv/flashcards_formateur.csv" 
-        },
-        {
-            name: "Ventes",
-            type: "directory",
-            children: [
-                { 
-                    name: "ventes_2024.csv", 
-                    type: "file", 
-                    path: "csv/Ventes/ventes_2024.csv" 
-                },
-                { 
-                    name: "ventes_2025.csv", 
-                    type: "file", 
-                    path: "csv/Ventes/ventes_2025.csv" 
-                }
-            ]
-        },
-        {
-            name: "Marketing",
-            type: "directory",
-            children: [
-                { 
-                    name: "campagne_ete.csv", 
-                    type: "file", 
-                    path: "csv/Marketing/campagne_ete.csv" 
-                }
-            ]
-        }
-    ];
+        // --- DOM ELEMENTS ---
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const appScreen = document.getElementById('app-screen');
+        const cardContainer = document.getElementById('card-container');
+        const cardFront = document.getElementById('card-front');
+        const cardBack = document.getElementById('card-back');
+        const answerButtons = document.getElementById('answer-buttons');
+        const deckNameEl = document.getElementById('deck-name');
+        const deckProgressEl = document.getElementById('deck-progress');
+        const fileInput = document.getElementById('file-input');
+        const downloadBtn = document.getElementById('download-progress');
+        const noCardsMessage = document.getElementById('no-cards-message');
+        const themeToggle = document.getElementById('theme-toggle');
 
+        // --- STATE MANAGEMENT ---
+        let appState = { deckName: null, cards: [], dueCards: [], currentCardIndex: -1 };
 
-    // ##################################################################
-    // #                    LOGIQUE DE L'APPLICATION                  #
-    // ##################################################################
-    
-    document.addEventListener('DOMContentLoaded', () => {
-        const fileTreeContainer = document.getElementById('file-tree');
-        const tableContainer = document.getElementById('table-container');
-        const fileNameDisplay = document.getElementById('file-name');
-
-        fileTreeContainer.innerHTML = createTreeHtml(fileStructure);
-
-        function createTreeHtml(nodes) {
-            let html = '<ul>';
-            nodes.forEach(node => {
-                if (node.type === 'directory') {
-                    html += `<li class="directory"><span>📁 ${node.name}</span>${createTreeHtml(node.children)}</li>`;
-                } else if (node.name.toLowerCase().endsWith('.csv')) {
-                    html += `<li class="file"><a data-path="${node.path}">📄 ${node.name}</a></li>`;
-                }
-            });
-            html += '</ul>';
-            return html;
+        function saveState() { localStorage.setItem('flashcard_app_state', JSON.stringify(appState)); }
+        function loadState() {
+            const savedState = localStorage.getItem('flashcard_app_state');
+            if (savedState) { appState = JSON.parse(savedState); return true; }
+            return false;
         }
 
-        fileTreeContainer.addEventListener('click', (event) => {
-            if (event.target.tagName === 'A' && event.target.dataset.path) {
-                const filePath = event.target.dataset.path;
-                loadAndDisplayCsv(filePath);
+        // --- DECK INITIALIZATION ---
+        function initializeDeck(cardsData, deckName) {
+            const now = new Date().toISOString().split('T')[0];
+            appState.deckName = deckName;
+            appState.cards = cardsData.map((card, index) => ({
+                id_unique: `${deckName}-${index}`,
+                Question: card.Question,
+                Réponse: card.Réponse,
+                prochaine_revision: now,
+                intervalle: 0,
+                facteur_facilite: 2.5,
+                statut: 'nouvelle'
+            }));
+            saveState();
+            render();
+        }
+
+        // --- SRS LOGIC (SuperMemo 2 inspired) ---
+        function processAnswer(quality) {
+            const card = appState.dueCards[appState.currentCardIndex];
+            if (quality < 2) {
+                card.intervalle = 1; card.statut = "apprentissage";
+            } else {
+                if (card.statut === 'nouvelle' || card.statut === 'apprentissage') {
+                    if (quality === 2) card.intervalle = 1;
+                    else if (quality === 3) card.intervalle = 3;
+                    else card.intervalle = 5;
+                    card.statut = "révision";
+                } else if (card.statut === 'révision') {
+                    card.facteur_facilite = Math.max(1.3, card.facteur_facilite + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)));
+                    card.intervalle = Math.ceil(card.intervalle * card.facteur_facilite);
+                }
             }
+            const reviewDate = new Date();
+            reviewDate.setDate(reviewDate.getDate() + card.intervalle);
+            card.prochaine_revision = reviewDate.toISOString().split('T')[0];
+            saveState();
+            render();
+        }
+
+        // --- UI & RENDERING ---
+        function render() {
+            if (!appState.deckName) {
+                welcomeScreen.classList.remove('hidden');
+                appScreen.classList.add('hidden');
+            } else {
+                welcomeScreen.classList.add('hidden');
+                appScreen.classList.remove('hidden');
+                const today = new Date().toISOString().split('T')[0];
+                appState.dueCards = appState.cards.filter(card => card.prochaine_revision <= today);
+                deckNameEl.textContent = appState.deckName;
+                const totalCards = appState.cards.length;
+                const dueCount = appState.dueCards.length;
+                deckProgressEl.textContent = `À réviser: ${dueCount} / ${totalCards}`;
+                if (dueCount > 0) {
+                    appState.currentCardIndex = 0;
+                    showCard();
+                    noCardsMessage.classList.add('hidden');
+                } else {
+                    cardContainer.classList.add('hidden');
+                    answerButtons.classList.add('hidden');
+                    noCardsMessage.classList.remove('hidden');
+                }
+            }
+        }
+        function showCard() {
+            const card = appState.dueCards[appState.currentCardIndex];
+            cardContainer.classList.remove('hidden', 'is-flipped');
+            cardFront.textContent = card.Question;
+            cardBack.textContent = card.Réponse;
+            answerButtons.classList.add('hidden');
+        }
+        function flipCard() { if (appState.dueCards.length > 0) { cardContainer.classList.add('is-flipped'); answerButtons.classList.remove('hidden'); } }
+
+        // --- FILE HANDLING (Permanent & Local) ---
+        async function loadPermanentDecks() {
+            try {
+                const response = await fetch('decks/manifest.json');
+                const manifest = await response.json();
+                const container = document.getElementById('permanent-decks-container');
+                manifest.forEach(deckInfo => {
+                    const button = document.createElement('button');
+                    button.className = 'btn';
+                    button.textContent = `Charger ${deckInfo.nom}`;
+                    button.onclick = () => loadPermanentDeck(deckInfo);
+                    container.appendChild(button);
+                });
+            } catch (error) { console.error("Impossible de charger la bibliothèque de decks.", error); }
+        }
+        async function loadPermanentDeck(deckInfo) {
+            try {
+                const response = await fetch(`decks/${deckInfo.fichier}`);
+                const deckData = await response.json();
+                initializeDeck(deckData, deckInfo.nom);
+            } catch (error) { console.error(`Erreur de chargement du deck ${deckInfo.nom}`, error); }
+        }
+        function handleLocalFileLoad(event) {
+            const file = event.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const csvText = e.target.result;
+                const deckName = file.name.replace(/\.csv$/, '');
+                try {
+                    const lines = csvText.trim().split('\n');
+                    const headers = lines.shift().split(',').map(h => h.trim());
+                    const qIndex = headers.indexOf('Question');
+                    const rIndex = headers.indexOf('Réponse');
+                    if (qIndex === -1 || rIndex === -1) throw new Error("Colonnes 'Question' et 'Réponse' manquantes.");
+                    const cardsData = lines.map(line => {
+                        const values = line.split(',');
+                        return {
+                            Question: (values[qIndex] || "").trim().replace(/"/g, ''),
+                            Réponse: (values[rIndex] || "").trim().replace(/"/g, '')
+                        };
+                    });
+                    initializeDeck(cardsData, deckName);
+                } catch (err) { alert(`Erreur de lecture du CSV: ${err.message}`); }
+            };
+            reader.readAsText(file, 'UTF-8');
+            fileInput.value = "";
+        }
+        function downloadProgress() {
+            if (!appState.cards || appState.cards.length === 0) return;
+            const headers = "Question,Réponse,prochaine_revision,intervalle,facteur_facilite,statut";
+            const rows = appState.cards.map(c => `"${c.Question}","${c.Réponse}",${c.prochaine_revision},${c.intervalle},${c.facteur_facilite},${c.statut}`);
+            const csvContent = [headers, ...rows].join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `${appState.deckName}_progress.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        // --- THEME ---
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            themeToggle.textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+        function applySavedTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') { document.body.classList.add('dark-mode'); themeToggle.textContent = '☀️'; } 
+            else { document.body.classList.remove('dark-mode'); themeToggle.textContent = '🌙'; }
+        }
+        
+        // --- INITIALIZATION & EVENT LISTENERS ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            applySavedTheme();
+            await loadPermanentDecks();
+            if (loadState()) { render(); }
         });
 
-        function loadAndDisplayCsv(path) {
-            fileNameDisplay.textContent = path;
-            tableContainer.innerHTML = '<p>Chargement...</p>';
-
-            fetch(path)
-                .then(response => {
-                    if (!response.ok) { throw new Error(`Fichier non trouvé (statut: ${response.status})`); }
-                    return response.text();
-                })
-                .then(csvText => {
-                    const table = document.createElement('table');
-                    const rows = csvText.trim().split(/\r?\n/);
-
-                    if (rows.length === 0 || rows[0].trim() === '') {
-                        tableContainer.innerHTML = '<p>Le fichier CSV est vide.</p>';
-                        return;
-                    }
-
-                    const separator = rows[0].includes(';') ? ';' : ',';
-                    const headers = rows[0].split(separator);
-                    const thead = table.createTHead();
-                    const headerRow = thead.insertRow();
-                    headers.forEach(header => {
-                        const th = document.createElement('th');
-                        th.textContent = header.trim();
-                        headerRow.appendChild(th);
-                    });
-                    
-                    const tbody = table.createTBody();
-                    for (let i = 1; i < rows.length; i++) {
-                        if(rows[i].trim() === '') continue;
-                        const cells = rows[i].split(separator);
-                        const bodyRow = tbody.insertRow();
-                        for(let j = 0; j < headers.length; j++) {
-                           const td = document.createElement('td');
-                           td.textContent = (cells[j] || '').trim();
-                           bodyRow.appendChild(td);
-                        }
-                    }
-                    
-                    tableContainer.innerHTML = '';
-                    tableContainer.appendChild(table);
-                })
-                .catch(error => {
-                    console.error(`Erreur de chargement pour ${path}:`, error);
-                    tableContainer.innerHTML = `<div class="error">
-                        <h3>Erreur de chargement</h3>
-                        <p>Impossible de charger le fichier <code>${path}</code>.</p>
-                        <p><strong>Vérifications :</strong> Le chemin dans la configuration est-il correct ? Le fichier a-t-il bien été envoyé sur GitHub ?</p>
-                    </div>`;
-                });
-        }
-    });
+        cardContainer.addEventListener('click', flipCard);
+        fileInput.addEventListener('change', handleLocalFileLoad);
+        downloadBtn.addEventListener('click', downloadProgress);
+        themeToggle.addEventListener('click', toggleTheme);
+        answerButtons.addEventListener('click', (e) => {
+            if(e.target.tagName !== 'BUTTON') return;
+            const qualityMap = { 'btn-again': 1, 'btn-hard': 2, 'btn-good': 3, 'btn-easy': 4 };
+            processAnswer(qualityMap[e.target.id]);
+        });
+        document.addEventListener('keydown', (e) => {
+            if (appState.deckName && appState.dueCards.length > 0) {
+                if (e.code === 'Space' && !cardContainer.classList.contains('is-flipped')) { e.preventDefault(); flipCard(); } 
+                else if (cardContainer.classList.contains('is-flipped')) {
+                    const qualityMap = { 'Digit1': 1, 'Digit2': 2, 'Digit3': 3, 'Digit4': 4 };
+                    if (qualityMap[e.code]) { processAnswer(qualityMap[e.code]); }
+                }
+            }
+        });
     </script>
 </body>
 </html>
