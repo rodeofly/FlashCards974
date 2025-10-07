@@ -6,5 +6,9 @@
   {
     "nom": "Deck 2 : Le Pôle MÉSO 📐 (L'Ingénierie Didactique)",
     "fichier": "deck2.json"
+  },
+  {
+    "nom": "Deck 3 : Le Pôle MICRO 🎭 (L'Agir et la Posture Réflexive)",
+    "fichier": "deck3.json"
   }
 ]
