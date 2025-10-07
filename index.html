@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flashcards SRS (v8)</title>
+    <title>Flashcards SRS (v9)</title>
     
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
@@ -129,6 +129,23 @@
         #file-input { display: none; }
         #permanent-decks-container { display: flex; flex-wrap: wrap; justify-content: center; }
 
+        /* Modal for study mode selection */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6); display: flex;
+            justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background-color: var(--card-bg); padding: 30px;
+            border-radius: var(--border-radius); text-align: left;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-content h3 { text-align: center; margin-bottom: 20px; }
+        .modal-content .btn { display: block; width: 100%; margin-top: 20px; }
+        .modal-content .radio-group { display: flex; flex-direction: column; gap: 15px; }
+        .modal-content label { display: flex; align-items: center; cursor: pointer; font-size: 18px; }
+        .modal-content input[type="radio"] { margin-right: 10px; }
+
     </style>
 </head>
 <body>
@@ -168,6 +185,18 @@
                 </div>
             </div>
         </main>
+        
+        <div id="study-mode-modal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h3>Choisir le mode d'affichage</h3>
+                <div class="radio-group">
+                    <label><input type="radio" name="study-mode" value="recto" checked> Afficher le Recto (Question)</label>
+                    <label><input type="radio" name="study-mode" value="verso"> Afficher le Verso (Réponse)</label>
+                    <label><input type="radio" name="study-mode" value="aleatoire"> Aléatoire</label>
+                </div>
+                <button class="btn" id="start-session-btn">Lancer la session</button>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -187,10 +216,15 @@
         const noCardsMessage = document.getElementById('no-cards-message');
         const themeToggle = document.getElementById('theme-toggle');
         const backToLibraryBtn = document.getElementById('btn-back-to-library');
-        const quitSessionBtn = document.getElementById('btn-quit-session'); // Nouveau bouton
+        const quitSessionBtn = document.getElementById('btn-quit-session');
+        const studyModeModal = document.getElementById('study-mode-modal');
+        const startSessionBtn = document.getElementById('start-session-btn');
 
         // --- STATE MANAGEMENT ---
-        let appState = { deckName: null, cards: [], dueCards: [], currentCardIndex: -1 };
+        let appState = { 
+            deckName: null, cards: [], dueCards: [], currentCardIndex: -1,
+            studyMode: 'recto' // 'recto', 'verso', or 'aleatoire'
+        };
 
         function saveState() { localStorage.setItem('flashcard_app_state', JSON.stringify(appState)); }
         function loadState() {
@@ -199,15 +233,16 @@
             return false;
         }
         function resetApp() {
-            appState = { deckName: null, cards: [], dueCards: [], currentCardIndex: -1 };
+            appState = { deckName: null, cards: [], dueCards: [], currentCardIndex: -1, studyMode: 'recto' };
             localStorage.removeItem('flashcard_app_state');
             render();
         }
 
         // --- DECK INITIALIZATION ---
-        function initializeDeck(cardsData, deckName) {
+        function initializeDeck(cardsData, deckName, mode) {
             const now = new Date().toISOString().split('T')[0];
             appState.deckName = deckName;
+            appState.studyMode = mode;
             appState.cards = cardsData.map((card, index) => ({
                 id_unique: `${deckName}-${index}`,
                 Question: card.Question,
@@ -245,6 +280,13 @@
         }
 
         // --- UI & RENDERING ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
         function render() {
             if (!appState.deckName) {
                 welcomeScreen.classList.remove('hidden');
@@ -252,12 +294,17 @@
             } else {
                 welcomeScreen.classList.add('hidden');
                 appScreen.classList.remove('hidden');
+                
                 const today = new Date().toISOString().split('T')[0];
                 appState.dueCards = appState.cards.filter(card => card.prochaine_revision <= today);
-                deckNameEl.textContent = appState.deckName;
+                
+                shuffleArray(appState.dueCards); // On mélange les cartes à chaque rendu
+
+                deckNameEl.textContent = `${appState.deckName} (Mode: ${appState.studyMode})`;
                 const totalCards = appState.cards.length;
                 const dueCount = appState.dueCards.length;
-                deckProgressEl.textContent = `À réviser: ${dueCount} / ${totalCards}`;
+                deckProgressEl.textContent = `À réviser: ${dueCount}`;
+                
                 if (dueCount > 0) {
                     appState.currentCardIndex = 0;
                     showCard();
@@ -272,8 +319,27 @@
         function showCard() {
             const card = appState.dueCards[appState.currentCardIndex];
             cardContainer.classList.remove('hidden', 'is-flipped');
-            cardFront.innerHTML = marked.parse(card.Question || '');
-            cardBack.innerHTML = marked.parse(card.Réponse || '');
+            
+            let questionText = card.Question;
+            let answerText = card.Réponse;
+            let showFrontFirst;
+
+            if (appState.studyMode === 'recto') {
+                showFrontFirst = true;
+            } else if (appState.studyMode === 'verso') {
+                showFrontFirst = false;
+            } else { // aleatoire
+                showFrontFirst = Math.random() < 0.5;
+            }
+
+            if (showFrontFirst) {
+                cardFront.innerHTML = marked.parse(questionText || '');
+                cardBack.innerHTML = marked.parse(answerText || '');
+            } else {
+                cardFront.innerHTML = marked.parse(answerText || ''); // Affiche Réponse au recto
+                cardBack.innerHTML = marked.parse(questionText || ''); // Affiche Question au verso
+            }
+
             answerButtons.classList.add('hidden');
             adjustCardHeight();
         }
@@ -288,7 +354,9 @@
 
         function flipCard() { if (appState.dueCards.length > 0) { cardContainer.classList.add('is-flipped'); answerButtons.classList.remove('hidden'); } }
 
-        // --- FILE HANDLING (Permanent & Local) ---
+        // --- FILE HANDLING & STUDY MODES ---
+        let deckToLoad = null; // Variable temporaire pour stocker les infos du deck à charger
+
         async function loadPermanentDecks() {
             try {
                 const response = await fetch('decks/manifest.json');
@@ -299,18 +367,41 @@
                     const button = document.createElement('button');
                     button.className = 'btn';
                     button.textContent = `Charger ${deckInfo.nom}`;
-                    button.onclick = () => loadPermanentDeck(deckInfo);
+                    button.onclick = () => {
+                        deckToLoad = { type: 'permanent', info: deckInfo };
+                        promptStudyMode();
+                    };
                     container.appendChild(button);
                 });
             } catch (error) { console.error("Impossible de charger la bibliothèque de decks.", error); }
         }
-        async function loadPermanentDeck(deckInfo) {
+
+        function promptStudyMode() {
+            studyModeModal.classList.remove('hidden');
+        }
+
+        startSessionBtn.addEventListener('click', () => {
+            const selectedMode = document.querySelector('input[name="study-mode"]:checked').value;
+            studyModeModal.classList.add('hidden');
+
+            if (deckToLoad) {
+                if (deckToLoad.type === 'permanent') {
+                    loadPermanentDeck(deckToLoad.info, selectedMode);
+                } else if (deckToLoad.type === 'local') {
+                    initializeDeck(deckToLoad.data, deckToLoad.name, selectedMode);
+                }
+                deckToLoad = null; // Reset
+            }
+        });
+
+        async function loadPermanentDeck(deckInfo, mode) {
             try {
                 const response = await fetch(`decks/${deckInfo.fichier}`);
                 const deckData = await response.json();
-                initializeDeck(deckData, deckInfo.nom);
+                initializeDeck(deckData, deckInfo.nom, mode);
             } catch (error) { console.error(`Erreur de chargement du deck ${deckInfo.nom}`, error); }
         }
+        
         function handleLocalFileLoad(event) {
             const file = event.target.files[0]; if (!file) return;
             const reader = new FileReader();
@@ -327,7 +418,10 @@
                         const values = line.split(',');
                         return { Question: (values[qIndex] || "").trim().replace(/"/g, ''), Réponse: (values[rIndex] || "").trim().replace(/"/g, '') };
                     });
-                    initializeDeck(cardsData, deckName);
+                    
+                    deckToLoad = { type: 'local', data: cardsData, name: deckName };
+                    promptStudyMode();
+
                 } catch (err) { alert(`Erreur de lecture du CSV: ${err.message}`); }
             };
             reader.readAsText(file, 'UTF-8');
@@ -364,7 +458,13 @@
         document.addEventListener('DOMContentLoaded', async () => {
             applySavedTheme();
             await loadPermanentDecks();
-            if (loadState()) { render(); }
+            if (loadState()) {
+                // If a state is loaded, we need to ensure studyMode has a default value if it's from an old version
+                if (typeof appState.studyMode === 'undefined') {
+                    appState.studyMode = 'recto';
+                }
+                render();
+            }
         });
 
         cardContainer.addEventListener('click', flipCard);
