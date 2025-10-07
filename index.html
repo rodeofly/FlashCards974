@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flashcards SRS (GitHub)</title>
+    <title>Flashcards SRS (v4)</title>
     <style>
         :root {
             --bg-color: #f4f4f9;
@@ -124,7 +124,12 @@
                     <button class="btn" id="btn-again">À revoir (1)</button><button class="btn" id="btn-hard">Difficile (2)</button>
                     <button class="btn" id="btn-good">Correct (3)</button><button class="btn" id="btn-easy">Facile (4)</button>
                 </div>
-                <p id="no-cards-message" class="hidden">Bravo ! Aucune carte à réviser pour aujourd'hui.</p>
+                
+                <div id="no-cards-message" class="hidden">
+                    <p>Bravo ! Aucune carte à réviser pour aujourd'hui.</p>
+                    <button class="btn" id="btn-back-to-library" style="margin-top: 16px;">Retourner à la bibliothèque</button>
+                </div>
+
                 <div class="controls">
                     <button class="btn btn-secondary" onclick="document.getElementById('file-input').click();">Charger un autre deck</button>
                     <button class="btn btn-secondary" id="download-progress">Télécharger la progression</button>
@@ -147,6 +152,7 @@
         const downloadBtn = document.getElementById('download-progress');
         const noCardsMessage = document.getElementById('no-cards-message');
         const themeToggle = document.getElementById('theme-toggle');
+        const backToLibraryBtn = document.getElementById('btn-back-to-library');
 
         // --- STATE MANAGEMENT ---
         let appState = { deckName: null, cards: [], dueCards: [], currentCardIndex: -1 };
@@ -156,6 +162,11 @@
             const savedState = localStorage.getItem('flashcard_app_state');
             if (savedState) { appState = JSON.parse(savedState); return true; }
             return false;
+        }
+        function resetApp() {
+            appState = { deckName: null, cards: [], dueCards: [], currentCardIndex: -1 };
+            localStorage.removeItem('flashcard_app_state');
+            render();
         }
 
         // --- DECK INITIALIZATION ---
@@ -238,6 +249,7 @@
                 const response = await fetch('decks/manifest.json');
                 const manifest = await response.json();
                 const container = document.getElementById('permanent-decks-container');
+                container.innerHTML = ''; // Clear previous buttons
                 manifest.forEach(deckInfo => {
                     const button = document.createElement('button');
                     button.className = 'btn';
@@ -317,6 +329,8 @@
         fileInput.addEventListener('change', handleLocalFileLoad);
         downloadBtn.addEventListener('click', downloadProgress);
         themeToggle.addEventListener('click', toggleTheme);
+        backToLibraryBtn.addEventListener('click', resetApp);
+
         answerButtons.addEventListener('click', (e) => {
             if(e.target.tagName !== 'BUTTON') return;
             const qualityMap = { 'btn-again': 1, 'btn-hard': 2, 'btn-good': 3, 'btn-easy': 4 };
